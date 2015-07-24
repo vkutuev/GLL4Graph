@@ -2,34 +2,34 @@
  * 
  */
 package org.iguana.embeded.graph;
+import org.iguana.util.Input;
 
 import java.util.List;
-
 
 /**
  * @author Ragozina Anastasiya
  *
  */
-public class InputGraph {
+public class InputGraph implements Input {
 	
 	private List<Edge>[] adjacencyList; 
 	
-	private List<Integer> startVerticies;
+	private int startVertix;
 	
-	private List<Integer> finalVerticies;
+	private List<Integer> finalVertices;
 	
-	public InputGraph(List<Edge>[] a, List<Integer> s, List<Integer> f) {
+	public InputGraph(List<Edge>[] a, int s, List<Integer> f) {
 		this.adjacencyList = a;
-		this.startVerticies = s;
-		this.finalVerticies = f;
+		this.startVertix = s;
+		this.finalVertices = f;
 	}
 	
-	public List<Integer> getStartsVerticies() {
-		return this.startVerticies;
+	public int getStartsVertices() {
+		return this.startVertix;
 	}
 	
 	public boolean isFinal(int v) {
-		return finalVerticies.contains(v);
+		return finalVertices.contains(v);
 	}
 	
 	public int getDestVertix(int v, String t) {
@@ -39,5 +39,10 @@ public class InputGraph {
 			}
 		}
 		return -1;
+	}
+	
+	@Override
+	public int getLength() {
+		return 3;
 	}
 }

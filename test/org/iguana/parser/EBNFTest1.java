@@ -40,7 +40,7 @@ import org.iguana.parser.GLLParser;
 import org.iguana.parser.ParserFactory;
 import org.iguana.regex.Plus;
 import org.iguana.util.Configuration;
-import org.iguana.util.Input;
+import org.iguana.util.InputImp;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,31 +61,39 @@ public class EBNFTest1 {
 	
 	static Nonterminal S = Nonterminal.withName("S");
 	static Nonterminal A = Nonterminal.withName("A");
+	static Nonterminal B = Nonterminal.withName("B");
 	static Terminal a = Terminal.from(Character.from('a'));
-
+	static Terminal d = Terminal.from(Character.from('d'));
+	static Terminal b = Terminal.from(Character.from('b'));
 
 	@Before
 	public void init() {
 		Grammar.Builder builder = new Grammar.Builder();
 		
-		Rule rule1 = Rule.withHead(S).addSymbols(Plus.from(A)).build();
+		Rule rule1 = Rule.withHead(S).addSymbols(A).build();
 		builder.addRule(rule1);
-		Rule rule2 = Rule.withHead(A).addSymbols(a).build();
+		Rule rule2 = Rule.withHead(A).addSymbols(a, d, B).build();
 		builder.addRule(rule2);
+		Rule rule3 = Rule.withHead(B).addSymbols(b).build();
+		builder.addRule(rule3);
+		Rule rule4 = Rule.withHead(A).addSymbols(a, d, b).build();
+		builder.addRule(rule4);
 		
 		grammar = new EBNFToBNF().transform(builder.build());
 	}
 	
-	@Test
-	public void testReachability() {
-		ReachabilityGraph reachabilityGraph = new ReachabilityGraph(grammar);
-		assertEquals(set(A, Nonterminal.withName("A+")), reachabilityGraph.getReachableNonterminals(S));
-	}
+	//@Test
+	//public void testReachability() {
+	//	ReachabilityGraph reachabilityGraph = new ReachabilityGraph(grammar);
+	//	assertEquals(set(A, Nonterminal.withName("A+")), reachabilityGraph.getReachableNonterminals(S));
+	//}
 	
 	@Test
 	public void testParser() {
-		Input input = Input.fromString("aaaaaa");
+		InputImp input = InputImp.fromString("adb");
 		GLLParser parser = ParserFactory.getParser(Configuration.DEFAULT, input, grammar);
+		
+		System.out.println(parser.parse(input, grammar, S).toString());
 		parser.parse(input, grammar, S);
 	}
 
