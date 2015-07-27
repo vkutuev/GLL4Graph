@@ -40,7 +40,7 @@ import org.iguana.parser.GLLParser;
 import org.iguana.parser.ParserFactory;
 import org.iguana.regex.Plus;
 import org.iguana.util.Configuration;
-import org.iguana.util.InputImp;
+import org.iguana.util.Input;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -90,7 +90,7 @@ public class EBNFTest1 {
 	
 	@Test
 	public void testParser() {
-		InputImp input = InputImp.fromString("adb");
+		Input input = Input.fromString("adb");
 		GLLParser parser = ParserFactory.getParser(Configuration.DEFAULT, input, grammar);
 		
 		System.out.println(parser.parse(input, grammar, S).toString());

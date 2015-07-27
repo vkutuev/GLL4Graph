@@ -10,7 +10,7 @@ import java.util.List;
  * @author Ragozina Anastasiya
  *
  */
-public class InputGraph implements Input {
+public class InputGraph {
 	
 	private List<Edge>[] adjacencyList; 
 	
@@ -41,8 +41,4 @@ public class InputGraph implements Input {
 		return -1;
 	}
 	
-	@Override
-	public int getLength() {
-		return 3;
-	}
 }
