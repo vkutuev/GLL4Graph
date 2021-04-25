@@ -148,11 +148,16 @@ public class IguanaRuntime<T extends Result> {
 
         Environment env = ctx.getEmptyEnvironment();
 
+        List<DefaultGSSNode<T>> startGSSNodes = new ArrayList<>();
 
-        List<DefaultGSSNode<T>> startGSSNodes = input.getStartVertices()
-                .stream()
-                .map(v -> new DefaultGSSNode<T>(startSymbol, v))
-                .collect(Collectors.toList());
+        for (Integer node: input.getStartVertices()){
+            startGSSNodes.add(new DefaultGSSNode<T>(startSymbol, node));
+        }
+
+//        List<DefaultGSSNode<T>> startGSSNodes = input.getStartVertices()
+//                .stream()
+//                .map(v -> new DefaultGSSNode<T>(startSymbol, v))
+//                .collect(Collectors.toList());
 
         startGSSNodes.forEach(node -> startSymbol.addStartGSSNode(node, node.getInputIndex()));
 //        startSymbol.addStartGSSNode(startGSSNodes.get(0), 0);
