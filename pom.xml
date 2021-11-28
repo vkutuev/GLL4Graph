@@ -108,16 +108,6 @@
 
     <repositories>
         <repository>
-            <id>usethesourcecapsule</id>
-            <url>http://nexus.usethesource.io/content/repositories/releases</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
             <id>usethesource</id>
             <url>http://nexus.usethesource.io/content/repositories/public/</url>
             <snapshots>
