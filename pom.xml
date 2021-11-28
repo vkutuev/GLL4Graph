@@ -137,6 +137,16 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>usethesourcecapsule</id>
+            <url>http://nexus.usethesource.io/content/repositories/releases</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
     </repositories>
 
     <build>
