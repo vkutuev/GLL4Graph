@@ -31,6 +31,6 @@ jobs:
           java-version: 11
 
       - name: Build and Test with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn --batch-mode --update-snapshots verify
         
       
