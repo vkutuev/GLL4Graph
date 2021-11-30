@@ -59,9 +59,9 @@ public class ParserResultOps implements ResultOps<NonPackedNode> {
         }
     };
 
-    private ParserLogger logger = ParserLogger.getInstance();
+    private final ParserLogger logger = ParserLogger.getInstance();
 
-    private Map<NonPackedNode, List<PackedNode>> packedNodesMap = new IdentityHashMap<>();
+    private final Map<NonPackedNode, List<PackedNode>> packedNodesMap = new IdentityHashMap<>();
 
     @Override
     public NonPackedNode dummy() {
@@ -91,22 +91,22 @@ public class ParserResultOps implements ResultOps<NonPackedNode> {
 
         if (current == null) {
             current = new IntermediateNode(slot, result1, result2);
-            logger.intermediateNodeAdded((IntermediateNode) current);
+            //logger.intermediateNodeAdded((IntermediateNode) current);
         } else {
             List<PackedNode> packedNodes = packedNodesMap.computeIfAbsent(current, key -> new ArrayList<>());
 
             if (!current.isAmbiguous()) {
                 PackedNode firstPackedNode = current.getFirstPackedNode();
-                logger.packedNodeAdded(firstPackedNode);
+               // logger.packedNodeAdded(firstPackedNode);
                 packedNodes.add(firstPackedNode);
 
                 current.setAmbiguous(true);
-                logger.ambiguousNodeAdded(current);
+            //    logger.ambiguousNodeAdded(current);
             }
 
             PackedNode packedNode = new PackedNode(slot, result1, result2);
             packedNodes.add(packedNode);
-            logger.packedNodeAdded(packedNode);
+           // logger.packedNodeAdded(packedNode);
         }
 
         return current;

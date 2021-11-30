@@ -31,8 +31,8 @@ public class DefaultInput extends AbstractInput {
     }
 
     @Override
-    public List<Integer> getStartVertices() {
-        return Collections.singletonList(0);
+    public Stream<Integer> getStartVertices() {
+        return Collections.singletonList(0).stream();
     }
 
     @Override

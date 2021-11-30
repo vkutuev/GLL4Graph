@@ -26,12 +26,8 @@
       },
       "body" : [
         {
-          "kind": "Terminal",
-          "name": "a",
-          "regex": {
-            "kind": "Char",
-            "val": 97
-          }
+          "kind" : "Nonterminal",
+          "name" : "S"
         },
         {
           "kind" : "Nonterminal",

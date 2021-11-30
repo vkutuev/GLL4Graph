@@ -1,29 +1,30 @@
 package iguana.utils.input;
 
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 
 import java.io.Closeable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+
 public class Neo4jBenchmarkInput extends Neo4jGraphInput implements Closeable {
-    private GraphDatabaseService graphDb;
-    private BiFunction<Relationship, Direction, String> toLabel;
-    private int start;
+    private final GraphDatabaseService graphDb;
+    private final BiFunction<Relationship, Direction, String> toLabel;
+    private final Stream<Integer> startVertices;
+    private final List<Integer> finalVertices;
     Transaction tx;
 
-    public Neo4jBenchmarkInput(GraphDatabaseService graphDb, BiFunction<Relationship, Direction, String> toLabel, int start) {
+    public Neo4jBenchmarkInput(GraphDatabaseService graphDb, BiFunction<Relationship, Direction, String> toLabel, Stream<Integer> startVertices, Integer verticesNumber) {
         super(graphDb);
         this.graphDb = graphDb;
         this.toLabel = toLabel;
-        this.start = start;
+        this.startVertices = startVertices;
         this.tx = graphDb.beginTx();
+        this.finalVertices = IntStream.range(0, verticesNumber).boxed().collect(Collectors.toList());
     }
 
     public long nVertices() {
@@ -59,18 +60,13 @@ public class Neo4jBenchmarkInput extends Neo4jGraphInput implements Closeable {
     }
 
     @Override
-    public List<Integer> getStartVertices() {
-        return tx.getAllNodes().stream()
-                .filter(node -> node.getId() == start)
-                .map(node -> (int) node.getId())
-                .collect(Collectors.toList());
+    public Stream<Integer> getStartVertices() {
+        return this.startVertices;
     }
 
     @Override
     public List<Integer> getFinalVertices() {
-        return tx.getAllNodes().stream()
-                .map(node -> (int) node.getId())
-                .collect(Collectors.toList());
+        return this.finalVertices;
     }
 
     @Override
@@ -88,8 +84,7 @@ public class Neo4jBenchmarkInput extends Neo4jGraphInput implements Closeable {
                                 : (int) rel.getEndNode().getId();
                     }
                     return null;
-                }).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override

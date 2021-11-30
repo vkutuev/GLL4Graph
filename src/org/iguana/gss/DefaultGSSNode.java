@@ -42,6 +42,8 @@ import org.iguana.result.ResultOps;
 import org.iguana.util.ParserLogger;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * If there is a cyclic GSSEdge, it's always the first one. If there is a cyclic GSS edge, there is always
@@ -82,22 +84,24 @@ public class DefaultGSSNode<T extends Result> implements GSSNode<T> {
 				addGSSEdge(firstGSSEdge);
 				firstGSSEdge = runtime.createGSSEdge(returnSlot, w, null, env);
 			}
-			ParserLogger.getInstance().gssEdgeAdded(firstGSSEdge);
+			// ParserLogger.getInstance().gssEdgeAdded(firstGSSEdge);
 			((CyclicDummyGSSEdges<T>) firstGSSEdge).addReturnSlot(returnSlot);
 			iterateOverPoppedElements(firstGSSEdge, returnSlot, destination, input, env, runtime);
 		} else {
 			GSSEdge<T> edge = runtime.createGSSEdge(returnSlot, w, destination, env);
-			ParserLogger.getInstance().gssEdgeAdded(edge);
+			// ParserLogger.getInstance().gssEdgeAdded(edge);
 			addGSSEdge(edge);
 			iterateOverPoppedElements(edge, returnSlot, destination, input, env, runtime);
 		}
 	}
 
     private void addGSSEdge(GSSEdge<T> edge) {
-        if (restGSSEdges == null) {
-            restGSSEdges = new ArrayList<>(4);
-        }
-        restGSSEdges.add(edge);
+		if (restGSSEdges == null) {
+			restGSSEdges = new ArrayList<>(4);
+		}
+		if (edge != null) {
+			restGSSEdges.add(edge);
+		}
 	}
 
     private void iterateOverPoppedElements(GSSEdge<T> edge, BodyGrammarSlot returnSlot, GSSNode<T> destination, Input input, Environment env, IguanaRuntime<T> runtime) {
@@ -116,7 +120,7 @@ public class DefaultGSSNode<T extends Result> implements GSSNode<T> {
 	}
 
 	public boolean pop(Input input, EndGrammarSlot slot, T result, Object value, IguanaRuntime<T> runtime) {
-		ParserLogger.getInstance().pop(this, result.getLeftExtent(), result, value);
+		// ParserLogger.getInstance().pop(this, result.getLeftExtent(), result, value);
 		T node = addPoppedElements(slot, result, value, runtime.getResultOps());
 		if (node != null)
 			iterateOverEdges(input, node, runtime);
@@ -136,6 +140,10 @@ public class DefaultGSSNode<T extends Result> implements GSSNode<T> {
 //		}
 
 		return node != null;
+	}
+
+	public boolean hasResult(int i) {
+		return poppedElements.containsKey(i);
 	}
 
 	public T getResult(int i) {
@@ -186,7 +194,6 @@ public class DefaultGSSNode<T extends Result> implements GSSNode<T> {
 	private void processPoppedElement(T poppedElement, GSSEdge<T> edge, BodyGrammarSlot returnSlot,
 									  GSSNode<T> destination, Input input, Environment env, IguanaRuntime<T> runtime) {
 		boolean anyMatchTestFollow = input.nextSymbols(poppedElement.getIndex())
-//				.stream()
 				.anyMatch(returnSlot::testFollow);
 		if (anyMatchTestFollow) {
 			T result = addDescriptor(input, this, poppedElement, edge, returnSlot, runtime);
@@ -206,15 +213,15 @@ public class DefaultGSSNode<T extends Result> implements GSSNode<T> {
 			processEdge(input, result, firstGSSEdge, firstGSSEdge.getReturnSlot(), runtime);
 		}
 
-		if (restGSSEdges != null)
+		if (restGSSEdges != null) {
 			for (GSSEdge<T> edge : restGSSEdges) {
 				processEdge(input, result, edge, edge.getReturnSlot(), runtime);
 			}
+		}
 	}
 
 	private void processEdge(Input input, T node, GSSEdge<T> edge, BodyGrammarSlot returnSlot, IguanaRuntime<T> runtime) {
 		boolean anyMatchTestFollow = input.nextSymbols(node.getIndex())
-//				.stream()
 				.anyMatch(returnSlot::testFollow);
 		if (!anyMatchTestFollow) return;
 
@@ -305,18 +312,17 @@ public class DefaultGSSNode<T extends Result> implements GSSNode<T> {
 				getInputIndex() == other.getInputIndex() &&
 				Arrays.equals(getData(), other.getData());
 	}
-
 	public int hashCode() {
 		return Objects.hash(getGrammarSlot().hashCode(), getInputIndex(), getData());
 	}
 
 	public Iterable<T> getPoppedElements() {
-		List<T> poppedElements = new ArrayList<>(countPoppedElements());
+		Stream.Builder<T> poppedElements = Stream.builder();
 		if (firstPoppedElement != null) poppedElements.add(firstPoppedElement);
 		if (restPoppedElements != null)
-			poppedElements.addAll(restPoppedElements.values());
+			restPoppedElements.values().forEach(poppedElements::add);
 
-		return poppedElements;
+		return poppedElements.build()::iterator;
 	}
 
 	public String toString() {

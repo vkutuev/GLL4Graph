@@ -10,10 +10,10 @@
       "body" : [
         {
           "kind": "Terminal",
-          "name": "a",
+          "name": "b",
           "regex": {
             "kind": "Char",
-            "val": 97
+            "val": 98
           }
         },
         {
@@ -22,10 +22,10 @@
         },
         {
           "kind": "Terminal",
-          "name": "b",
+          "name": "a",
           "regex": {
             "kind": "Char",
-            "val": 98
+            "val": 97
           }
         }
       ]
@@ -38,32 +38,11 @@
       },
       "body" : [
         {
-          "kind" : "Nonterminal",
-          "name" : "Middle"
-        }
-      ]
-    },
-    {
-      "kind" : "Rule",
-      "head" : {
-        "kind" : "Nonterminal",
-        "name" : "Middle"
-      },
-      "body" : [
-        {
           "kind": "Terminal",
           "name": "a",
           "regex": {
             "kind": "Char",
             "val": 97
-          }
-        },
-        {
-          "kind": "Terminal",
-          "name": "b",
-          "regex": {
-            "kind": "Char",
-            "val": 98
           }
         }
       ]

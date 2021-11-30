@@ -39,11 +39,10 @@ import org.iguana.sppf.NonterminalNode;
 import org.iguana.traversal.AmbiguousSPPFToParseTreeVisitor;
 import org.iguana.traversal.DefaultSPPFToParseTreeVisitor;
 import org.iguana.util.Configuration;
+import org.iguana.util.Tuple;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class IguanaParser {
 
@@ -67,12 +66,21 @@ public class IguanaParser {
         return (Map<Pair, NonterminalNode>) runtime.run(input, grammarGraph, options.getMap(), options.isGlobal());
     }
 
+    public Stream<Pair> getPairs(Input input, ParseOptions options) {
+        return runtime.no_sppf_run(input, grammarGraph, options.getMap(), options.isGlobal());
+    }
+
     public ParseTreeNode getParserTree(Input input) {
         return getParserTree(input, new ParseOptions.Builder().build());
     }
 
     public Map<Pair, ParseTreeNode> getParserTree(GraphInput input) {
         return getParserTree(input, new ParseOptions.Builder().build());
+    }
+
+
+    public Stream<Pair>  getReachabilities(Input input, ParseOptions options) {
+        return getPairs(input, options);
     }
 
     public ParseTreeNode getParserTree(Input input, ParseOptions options) {

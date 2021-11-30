@@ -3,8 +3,8 @@ package org.iguana.parser;
 import java.util.Objects;
 
 public class Pair {
-    int startVertex;
-    int endVertex;
+    public int startVertex;
+    public int endVertex;
 
     public Pair(int startVertex, int endVertex) {
         this.startVertex = startVertex;
@@ -18,6 +18,10 @@ public class Pair {
         Pair pair = (Pair) o;
         return startVertex == pair.startVertex &&
                 endVertex == pair.endVertex;
+    }
+
+    public boolean equalsKey(int start) {
+        return startVertex == start;
     }
 
     @Override
