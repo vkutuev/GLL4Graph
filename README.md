@@ -1,14 +1,14 @@
 ![example workflow](https://github.com/YaccConstructor/iguana/actions/workflows/main.yml/badge.svg)
 
-# Iguana
+# GLL4Graph
 
-This is the implementation of the GLL-based context-free path querying (CFPQ) algorithm. It is based on a high-performance GLL parsing algorithm implemented in Iguana project. Then, it was modificated to support graph-structured input data. Proposed solution solves both reachability and all paths problems for all pairs and multiple sources cases.
+This is the implementation of the GLL-based context-free path querying (CFPQ) algorithm. It is based on a high-performance GLL parsing algorithm implemented in [Iguana](https://iguana-parser.github.io/) project. Then, it was modificated to support graph-structured input data. Proposed solution solves both reachability and all paths problems for all pairs and multiple sources cases.
 
 ## Performance
 
 The proposed solution has been evaluated on several real-world graphs for both the all pairs and the multiple sources scenarios. The evaluation shows that the proposed solution is more than 25 times faster than the previous solution for Neo4j and is comparable, in some cases, with the linear algebra based solution for RedisGraph.
 
-**Machine configuration**: PC with Ubuntu 20.04, Intel Core i7-6700 3.40GHz CPU, DDR4 64Gb RAM, GeForce GTX 1070 GPU with 8Gb VRAM.
+**Machine configuration**: PC with Ubuntu 20.04, Intel Core i7-6700 3.40GHz CPU, DDR4 64Gb RAM.
 
 **Enviroment configuration**: 
 * Java HotSpot(TM) 64-Bit server virtual machine (build 15.0.2+7-27, mixed mode, sharing).
@@ -77,13 +77,13 @@ Grammar used for static code analysis graphs:
   M -> d_r V d
   V -> (M? a_r)* M? (a M?)* 
   ```
-  
+
 ### Results
   
 The results of the **all pairs reachability** queries evaluation are presented in the table below.
 
-| Graph name   |  G<sub>1</sub>  |         | G<sub>2</sub>    |           | Geo        |             |          PointsTo        |            |
-|:-------------|:---------------:|:-------:|:---------------:|:---------:|:----------:|:-----------:|:------------------------:|:----------:|
+| Graph name   | G<sub>1</sub>            || G<sub>2</sub>   |           | Geo        |             |          PointsTo        |            |
+|:-------------|:---------------:|---------|:---------------:|:---------:|:----------:|:-----------:|:------------------------:|:----------:|
 |              |   time (sec)    | #answer |   time (sec)    |  #answer  | time (sec) |   #answer   |        time (sec)        |  #answer   |
 | Go hierarchy |     564,72      | 588 976 |     2813,50     |  738 937  |     –      |      –      |            –             |     –      |
 | Enzyme       |      0,19       |   396   |      0,17       |   8163    |    8,54    | 14 267 542  |            –             |     –      |
