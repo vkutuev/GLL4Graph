@@ -1,4 +1,4 @@
-![example workflow](https://github.com/YaccConstructor/iguana/actions/workflows/main.yml/badge.svg)
+![example workflow](https://github.com/JetBrains-Research/GLL4Graph/actions/workflows/main.yml/badge.svg)
 
 # GLL4Graph
 
@@ -107,8 +107,8 @@ The evaluation results for **multiple source** CFPQ for **Geospecies** graph and
 The project is build with Maven.
 
 ```
-git clone https://github.com/YaccConstructor/iguana
-cd iguana
+git clone https://github.com/JetBrains-Research/GLL4Graph
+cd GLL4Graph
 mvn compile
 ```
 ## Usage
@@ -143,4 +143,4 @@ mvn exec:java -Dexec.mainClass="benchmark.Neo4jBenchmark" -Dexec.args="bt 450609
 ## License
 
 This project is licensed under OpenBSD License. License text can be found in the 
-[license file](https://github.com/YaccConstructor/iguana/blob/GLL-for-graph/LICENSE.md).
+[license file](https://github.com/JetBrains-Research/GLL4Graph/blob/GLL-for-graph/LICENSE.md).
