@@ -82,19 +82,128 @@ Grammar used for static code analysis graphs:
   
 The results of the **all pairs reachability** queries evaluation are presented in the table below.
 
-| Graph name   | G<sub>1</sub>            || G<sub>2</sub>   |           | Geo        |             |          PointsTo        |            |
-|:-------------|:---------------:|---------|:---------------:|:---------:|:----------:|:-----------:|:------------------------:|:----------:|
-|              |   time (sec)    | #answer |   time (sec)    |  #answer  | time (sec) |   #answer   |        time (sec)        |  #answer   |
-| Go hierarchy |     564,72      | 588 976 |     2813,50     |  738 937  |     –      |      –      |            –             |     –      |
-| Enzyme       |      0,19       |   396   |      0,17       |   8163    |    8,54    | 14 267 542  |            –             |     –      |
-| Eclass_514en |     295,06      | 90 994  |     279,80      |  96 163   |     –      |      –      |            –             |     –      |
-| Geospecies   |      2,64       |   85    |      2,00       |     0     |   256,86   | 226 669 749 |            –             |     –      |
-| Go           |      11,18      | 640 316 |      10,00      |  659 501  |     –      |      –      |            –             |     –      |
-| Taxonomy     |      43,72      | 151 706 |      29,58      | 2 112 637 |     –      |      –      |            –             |     –      |
-| Init         |        –        |    –    |        –        |     –     |     –      |      –      |          113,35          | 3 783 769  |
-| Drivers      |        –        |    –    |        –        |     –     |     –      |      –      |          736,81          | 18 825 025 |
-| Kernel       |        –        |    –    |        –        |     –     |     –      |      –      |          850,46          | 16 747 731 |
-
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" align="left">Graph name</th>
+      <th colspan="2" align="center">G<sub>1</sub></th>
+      <th colspan="2" align="center">G<sub>2</sub></th>
+      <th colspan="2" align="center">Geo</th>
+      <th colspan="2" align="center">PointsTo</th>
+    </tr>
+    <tr>
+      <td align="center">time (sec)</td>
+      <td>#answer</td>
+      <td align="center">time (sec)</td>
+      <td align="center">#answer</td>
+      <td align="center">time (sec)</td>
+      <td align="center">#answer</td>
+      <td align="center">time (sec)</td>
+      <td align="center">#answer</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">Go hierarchy</td>
+      <td align="center">564,72</td>
+      <td>588 976</td>
+      <td align="center">2813,50</td>
+      <td align="center">738 937</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+    </tr>
+    <tr>
+      <td align="left">Enzyme</td>
+      <td align="center">0,19</td>
+      <td>396</td>
+      <td align="center">0,17</td>
+      <td align="center">8163</td>
+      <td align="center">8,54</td>
+      <td align="center">14 267 542</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+    </tr>
+    <tr>
+      <td align="left">Eclass_514en</td>
+      <td align="center">295,06</td>
+      <td>90 994</td>
+      <td align="center">279,80</td>
+      <td align="center">96 163</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+    </tr>
+    <tr>
+      <td align="left">Geospecies</td>
+      <td align="center">2,64</td>
+      <td>85</td>
+      <td align="center">2,00</td>
+      <td align="center">0</td>
+      <td align="center">256,86</td>
+      <td align="center">226 669 749</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+    </tr>
+    <tr>
+      <td align="left">Go</td>
+      <td align="center">11,18</td>
+      <td>640 316</td>
+      <td align="center">10,00</td>
+      <td align="center">659 501</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+    </tr>
+    <tr>
+      <td align="left">Taxonomy</td>
+      <td align="center">43,72</td>
+      <td>151 706</td>
+      <td align="center">29,58</td>
+      <td align="center">2 112 637</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+    </tr>
+    <tr>
+      <td align="left">Init</td>
+      <td align="center">–</td>
+      <td>–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">113,35</td>
+      <td align="center">3 783 769</td>
+    </tr>
+    <tr>
+      <td align="left">Drivers</td>
+      <td align="center">–</td>
+      <td>–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">736,81</td>
+      <td align="center">18 825 025</td>
+    </tr>
+    <tr>
+      <td align="left">Kernel</td>
+      <td align="center">–</td>
+      <td>–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+      <td align="center">850,46</td>
+      <td align="center">16 747 731</td>
+    </tr>
+  </tbody>
+</table>
 
 <br/>
 
