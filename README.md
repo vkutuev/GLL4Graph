@@ -13,7 +13,9 @@ The proposed solution has been evaluated on several real-world graphs for both t
 **Enviroment configuration**: 
 * Java HotSpot(TM) 64-Bit server virtual machine (build 15.0.2+7-27, mixed mode, sharing).
 * JVM heap configuration: 55Gb both xms and xmx.
-* Neo4j 4.0.3 is used. Almost all default configurations are default except: total off-heap transaction memory (tx_state_max_off_heap_memory parameter) is 24Gb, and pagecache_warmup_enabled is set to true.
+* Neo4j 4.0.3 is used. Almost all configurations are default except two:
+     * total off-heap transaction memory (tx_state_max_off_heap_memory parameter) is set to 24Gb
+     * pagecache_warmup_enabled is set to true.
 
 
 ### Graphs
