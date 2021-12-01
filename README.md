@@ -49,7 +49,7 @@ All queries used in evaluation are variants of same-generation query. The invers
 
 <br/>
 
-Grammars used for RDF graphs:
+Grammars used for **RDF** graphs:
 
 **G<sub>1</sub>**
 ```
@@ -70,7 +70,7 @@ S -> broaderTransitive S broaderTransitive_r
 
 <br/>
 
-Grammar used for static code analysis graphs:
+Grammar used for **static code analysis** graphs:
   
 **PointsTo**
   ```
@@ -244,9 +244,25 @@ arg7 | The name of a file with result
 arg8 | Grammar name (g1/g2/geo/pointsTo)
 
 ### Example
-To run experiments on Geospecies graph on Geo grammar use the following command:
+
+Here is an example which can be run right after project is downloaded and results directory is created without any additional preparation.
+
+To run experiments on **Core** graph on **G<sub>1</sub>** grammar use the following command:
+
 ```
-mvn exec:java -Dexec.mainClass="benchmark.Neo4jBenchmark" -Dexec.args="bt 450609 2 5 home/user/data/graphs/geospecies/ test/resources/grammars/graph/g1/grammar.json geospecies g1"
+mvn exec:java -Dexec.mainClass="benchmark.Neo4jBenchmark" -Dexec.args="st 1323 2 5 <ABS_PATH_TO_PROJECT>/data/core/ test/resources/grammars/graph/g1/grammar.json core g1"
+```
+
+### Data
+To get more graph data examples use Python script:
+
+```
+graph_loader.py --graph {graph_name} --relationships {comma_separated_relationships_list}
+```
+
+For example:
+```
+graph_loader.py --graph core --relationships subClassOf,type
 ```
 
 ## License
