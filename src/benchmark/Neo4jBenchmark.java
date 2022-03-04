@@ -5,6 +5,8 @@ import apoc.create.Create;
 import apoc.help.Help;
 import apoc.load.*;
 import apoc.periodic.*;
+
+import static java.lang.System.gc;
 import static java.util.Arrays.asList;
 import com.google.common.collect.Lists;
 
@@ -289,8 +291,8 @@ public class Neo4jBenchmark {
         }
 
         List<Tuple<Integer, Integer>> chunkSize = Arrays.asList(
-                new Tuple<>(nodeNumber, 100)
-                // new Tuple<>(1, 100)
+//                new Tuple<>(nodeNumber, 100)
+                 new Tuple<>(1, 100)
                 //, new Tuple<>(10, 20)
                 //, new Tuple<>(50, 30)
                 //, new Tuple<>(100, 50)
@@ -312,22 +314,27 @@ public class Neo4jBenchmark {
                 int finalIter = iter;
                 verticesPartitioned.forEach(chunk -> {
                     GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
-                    System.out.println("iteration: " + finalIter + " first vertex: " + chunk.get(0));
                     long result = 0;
-                    long t1_local = System.nanoTime();
-                    Stream<Pair> parseResults = parser.getReachabilities(input,
-                            new ParseOptions.Builder().setAmbiguous(false).build());
-                    if (parseResults != null) {
-                        result = parseResults.count();
-                    }
-                    long t2_local = System.nanoTime();
-                    long stepTime = t2_local - t1_local;
-                    if (finalIter >= warmUp) {
-                                resulTimePerChunk.print("," + stepTime);
-                    }
-                    System.out.println(" time: " + stepTime + "\n" + "ans:" + result);
-                    ((Neo4jBenchmarkInput) input).close();
+//                    if (chunk.get(0) == 14013) {
+                        System.out.println("iteration: " + finalIter + " first vertex: " + chunk.get(0));
+                        long t1_local = System.nanoTime();
+                        Stream<Pair> parseResults = parser.getReachabilities(input,
+                                new ParseOptions.Builder().setAmbiguous(false).build());
+                        if (parseResults != null) {
+                            result = parseResults.count();
+                        }
+                        long t2_local = System.nanoTime();
+                        long stepTime = t2_local - t1_local;
+                        if (finalIter >= warmUp) {
+                            resulTimePerChunk.print("," + stepTime);
+                        }
+//                        if (stepTime > 1000000000) {
 
+                        System.out.println(" time: " + stepTime + "\n" + "ans:" + result);
+//                        }
+                        ((Neo4jBenchmarkInput) input).close();
+//                    }
+                    gc();
                 });
                 long t2 = System.nanoTime();
               //  if (iter >= warmUp) {
