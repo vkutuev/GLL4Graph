@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class ParserResultOps implements ResultOps<NonPackedNode> {
 
@@ -93,6 +94,7 @@ public class ParserResultOps implements ResultOps<NonPackedNode> {
             current = new IntermediateNode(slot, result1, result2);
             //logger.intermediateNodeAdded((IntermediateNode) current);
         } else {
+            //Stream.Builder<PackedNode> packedNodes = Stream.builder();
             List<PackedNode> packedNodes = packedNodesMap.computeIfAbsent(current, key -> new ArrayList<>());
 
             if (!current.isAmbiguous()) {

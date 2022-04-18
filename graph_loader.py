@@ -7,7 +7,7 @@ import numpy as np
 
 
 def generate_nodes(path_to_dir, file_name, node_number):
-    path_to_file = path_to_dir + "/" + file_name + "_nodes.csv"
+    path_to_file = path_to_dir + "/" + file_name + "_all_nodes.csv"
     nodes = np.random.permutation(node_number)
     with open(path_to_file, 'w') as f:
         for node in nodes:

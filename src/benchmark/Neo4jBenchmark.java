@@ -56,7 +56,7 @@ public class Neo4jBenchmark {
         }
     };
     private static final String st = "st";
-    private static final String da = "da";
+    private static final String da = "ad";
 
     //    args0 rel type (st/bt/nt)
     //    args1 nodeNumber
@@ -69,7 +69,7 @@ public class Neo4jBenchmark {
     public static void main(String[] args) throws IOException {
 
         loadGraph(args[6], Integer.parseInt(args[1]), args[4], args[0]);
-//        benchmark(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6]);
+        benchmark(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
         benchmarkReachabilities(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
         removeData();
         managementService.shutdown();
@@ -185,7 +185,7 @@ public class Neo4jBenchmark {
                 Periodic.class
         ));
 
-        try (Stream<String> inputNodes = Files.lines(Paths.get("/" + pathToDataset + dataset + "_nodes.csv"))) {
+        try (Stream<String> inputNodes = Files.lines(Paths.get("/" + pathToDataset + dataset + "_all_nodes.csv"))) {
             try (Transaction tx = graphDb.beginTx()){
                 inputNodes.forEach(node -> {
                     String s = String.format("CREATE (:Node {name: '%d'});", Integer.parseInt(node));
@@ -289,8 +289,8 @@ public class Neo4jBenchmark {
         }
 
         List<Tuple<Integer, Integer>> chunkSize = Arrays.asList(
-                new Tuple<>(nodeNumber, 100)
-                // new Tuple<>(1, 100)
+                //new Tuple<>(nodeNumber, 100)
+                new Tuple<>(1, 100)
                 //, new Tuple<>(10, 20)
                 //, new Tuple<>(50, 30)
                 //, new Tuple<>(100, 50)
@@ -300,19 +300,20 @@ public class Neo4jBenchmark {
                 //, new Tuple<>(10000, 100)
         );
         for (Tuple<Integer, Integer> sz : chunkSize) {
-            List<List<Integer>> verticesPartitioned = Lists.partition(vertices.subList(0, vertices.size() * sz.getSecond() / 100), sz.getFirst());
+           // List<List<Integer>> verticesPartitioned = Lists.partition(vertices.subList(0, vertices.size() * sz.getSecond() / 100), sz.getFirst());
             Files.createDirectories(Paths.get("results/" + dataset + "/" + grammarName));
             PrintWriter resulTimePerChunk = new PrintWriter("results/" + dataset + "/" + grammarName + "/" + "chunkSize_" + sz.getFirst() + ".txt");
+          //  PrintWriter bigResulTimePerChunk = new PrintWriter("results/" + dataset + "/" + grammarName + "/" + "chunkSize_" + sz.getFirst() + "_big.txt");
             for (int iter = 0; iter < maxIter; ++iter) {
                 IguanaParser parser = new IguanaParser(grammar);
                 long t1 = System.nanoTime();
-                if (iter >= warmUp) {
-                    resulTimePerChunk.print(iter - warmUp + 1);
-                }
+               // if (iter >= warmUp) {
+                 //   resulTimePerChunk.print(iter - warmUp + 1);
+                //}
                 int finalIter = iter;
-                verticesPartitioned.forEach(chunk -> {
-                    GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
-                    System.out.println("iteration: " + finalIter + " first vertex: " + chunk.get(0));
+                vertices.forEach(chunk -> {
+                    GraphInput input = new Neo4jBenchmarkInput(graphDb, f, Stream.of(chunk), nodeNumber);
+                    System.out.println("iteration: " + finalIter + " first vertex: " + chunk);
                     long result = 0;
                     long t1_local = System.nanoTime();
                     Stream<Pair> parseResults = parser.getReachabilities(input,
@@ -323,9 +324,13 @@ public class Neo4jBenchmark {
                     long t2_local = System.nanoTime();
                     long stepTime = t2_local - t1_local;
                     if (finalIter >= warmUp) {
-                                resulTimePerChunk.print("," + stepTime);
+                                resulTimePerChunk.println(stepTime);
                     }
                     System.out.println(" time: " + stepTime + "\n" + "ans:" + result);
+
+                  //  if (stepTime > 1000000000) {
+                    //    resulTimePerChunk.println(chunk.get(0) + "," + stepTime);
+                    //}
                     ((Neo4jBenchmarkInput) input).close();
 
                 });
@@ -336,9 +341,10 @@ public class Neo4jBenchmark {
                  //   resulTimePerChunk.println();
                 //}
                 // System.out.println("Total time: " + (t2 - t1));
-                Runtime.getRuntime().gc();
+                //Runtime.getRuntime().gc();
             }
             resulTimePerChunk.close();
+           // bigResulTimePerChunk.close();
         }
     }
 
@@ -362,13 +368,13 @@ public class Neo4jBenchmark {
 
         List<Tuple<Integer, Integer>> chunkSize = Arrays.asList(
                 new Tuple<>(1, 100)
-                , new Tuple<>(10, 100)
-                , new Tuple<>(50, 100)
-                , new Tuple<>(100, 100)
-                , new Tuple<>(500, 100)
-                , new Tuple<>(1000, 100)
-                , new Tuple<>(5000, 100)
-                , new Tuple<>(10000, 100)
+//                , new Tuple<>(10, 100)
+//               , new Tuple<>(50, 100)
+//                , new Tuple<>(100, 100)
+//                , new Tuple<>(500, 100)
+//                , new Tuple<>(1000, 100)
+//                , new Tuple<>(5000, 100)
+//                , new Tuple<>(10000, 100)
         );
         for (Tuple<Integer, Integer> sz : chunkSize) {
             List<List<Integer>> verticesPartitioned = Lists.partition(vertices.subList(0, vertices.size() * sz.getSecond() / 100), sz.getFirst());
@@ -383,15 +389,17 @@ public class Neo4jBenchmark {
                 verticesPartitioned.forEach(chunk -> {
                     GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
                     System.out.println("iteration: " + finalIter + " first vertex: " + chunk.get(0));
-                    long t1_local = System.nanoTime();
-                    Map<Pair, ParseTreeNode> parseResults = parser.getParserTree(input,
-                            new ParseOptions.Builder().setAmbiguous(true).build());
-                    long t2_local = System.nanoTime();
-                    long stepTime = t2_local - t1_local;
-                    if (finalIter >= warmUp) {
-                        resulTimePerChunk.print("," + stepTime);
-                    }
-                    System.out.println(" time: " + stepTime);
+                        long t1_local = System.nanoTime();
+                        Map<Pair, ParseTreeNode> parseResults = parser.getParserTree(input,
+                                new ParseOptions.Builder().setAmbiguous(false).build());
+                        long t2_local = System.nanoTime();
+                        long stepTime = t2_local - t1_local;
+                        if (finalIter >= warmUp) {
+                            resulTimePerChunk.println(stepTime);
+                        }
+                        if (parseResults != null) {
+                            System.out.println(" time: " + stepTime + "\n" + "ans:" + parseResults.size());
+                        }
                     ((Neo4jBenchmarkInput) input).close();
 
                 });
