@@ -193,24 +193,14 @@ public class DefaultGSSNode<T extends Result> implements GSSNode<T> {
 
 	private void processPoppedElement(T poppedElement, GSSEdge<T> edge, BodyGrammarSlot returnSlot,
 									  GSSNode<T> destination, Input input, Environment env, IguanaRuntime<T> runtime) {
-<<<<<<< HEAD
 		//boolean anyMatchTestFollow = input.nextSymbols(poppedElement.getIndex())
 		//		.anyMatch(returnSlot::testFollow);
 		//if (anyMatchTestFollow) {
-=======
-//		boolean anyMatchTestFollow = input.nextSymbols(poppedElement.getIndex())
-//				.anyMatch(returnSlot::testFollow);
-//		if (anyMatchTestFollow) {
->>>>>>> 877f37c6d008c2ac2a75f8b509d9cfd86626bf93
 			T result = addDescriptor(input, this, poppedElement, edge, returnSlot, runtime);
 			if (result != null) {
 				runtime.scheduleDescriptor(returnSlot, destination, result, env);
 			}
-<<<<<<< HEAD
 		//}
-=======
-//		}
->>>>>>> 877f37c6d008c2ac2a75f8b509d9cfd86626bf93
 	}
 
 	private void iterateOverEdges(Input input, T result, IguanaRuntime<T> runtime) {
@@ -231,15 +221,9 @@ public class DefaultGSSNode<T extends Result> implements GSSNode<T> {
 	}
 
 	private void processEdge(Input input, T node, GSSEdge<T> edge, BodyGrammarSlot returnSlot, IguanaRuntime<T> runtime) {
-<<<<<<< HEAD
 		//boolean anyMatchTestFollow = input.nextSymbols(node.getIndex())
 		//		.anyMatch(returnSlot::testFollow);
 		//if (!anyMatchTestFollow) return;
-=======
-//		boolean anyMatchTestFollow = input.nextSymbols(node.getIndex())
-//				.anyMatch(returnSlot::testFollow);
-//		if (!anyMatchTestFollow) return;
->>>>>>> 877f37c6d008c2ac2a75f8b509d9cfd86626bf93
 
 		T result = addDescriptor(input, this, node, edge, returnSlot, runtime);
 		if (result != null) {

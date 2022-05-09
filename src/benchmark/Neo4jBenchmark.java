@@ -292,13 +292,8 @@ public class Neo4jBenchmark {
         }
 
         List<Tuple<Integer, Integer>> chunkSize = Arrays.asList(
-<<<<<<< HEAD
-                new Tuple<>(nodeNumber, 100)
-                //new Tuple<>(1, 100)
-=======
 //                new Tuple<>(nodeNumber, 100)
                  new Tuple<>(1, 100)
->>>>>>> 877f37c6d008c2ac2a75f8b509d9cfd86626bf93
                 //, new Tuple<>(10, 20)
                 //, new Tuple<>(50, 30)
                 //, new Tuple<>(100, 50)
@@ -321,7 +316,6 @@ public class Neo4jBenchmark {
                 int finalIter = iter;
                 verticesPartitioned.forEach(chunk -> {
                     GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
-<<<<<<< HEAD
                     //System.out.println("iteration: " + finalIter + " first vertex: " + chunk);
                     long result = 0;
                     long t1_local = System.nanoTime();
@@ -341,23 +335,6 @@ public class Neo4jBenchmark {
                     //    resulTimePerChunk.println(chunk.get(0) + "," + stepTime);
                     //}
                     ((Neo4jBenchmarkInput) input).close();
-=======
-                    long result = 0;
-//                    if (chunk.get(0) == 14013) {
-                        System.out.println("iteration: " + finalIter + " first vertex: " + chunk.get(0));
-                        long t1_local = System.nanoTime();
-                        Stream<Pair> parseResults = parser.getReachabilities(input,
-                                new ParseOptions.Builder().setAmbiguous(false).build());
-                        if (parseResults != null) {
-                            result = parseResults.count();
-                        }
-                        long t2_local = System.nanoTime();
-                        long stepTime = t2_local - t1_local;
-                        if (finalIter >= warmUp) {
-                            resulTimePerChunk.print("," + stepTime);
-                        }
-//                        if (stepTime > 1000000000) {
->>>>>>> 877f37c6d008c2ac2a75f8b509d9cfd86626bf93
 
                         System.out.println(" time: " + stepTime + "\n" + "ans:" + result);
 //                        }
