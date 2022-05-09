@@ -20,6 +20,7 @@ import org.iguana.parser.Pair;
 import org.iguana.parser.ParseOptions;
 import org.iguana.parsetree.ParseTreeNode;
 
+import org.iguana.sppf.NonterminalNode;
 import org.iguana.util.Tuple;
 import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.configuration.connectors.BoltConnector;
@@ -69,7 +70,7 @@ public class Neo4jBenchmark {
     public static void main(String[] args) throws IOException {
 
         loadGraph(args[6], Integer.parseInt(args[1]), args[4], args[0]);
-        benchmark(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
+        //benchmark(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
         benchmarkReachabilities(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
         removeData();
         managementService.shutdown();
@@ -282,15 +283,15 @@ public class Neo4jBenchmark {
             throw new RuntimeException("No grammar.json file is present");
         }
         List<Integer> vertices = new ArrayList<>();
-        try (Stream<String> inputNodes = Files.lines(Paths.get("/" + pathToDataset + dataset + "_nodes.csv"))) {
+        try (Stream<String> inputNodes = Files.lines(Paths.get("/" + pathToDataset + dataset + "_all_nodes.csv"))) {
                 inputNodes.forEach(node -> {
                     vertices.add(Integer.parseInt(node));
                 });
         }
 
         List<Tuple<Integer, Integer>> chunkSize = Arrays.asList(
-                //new Tuple<>(nodeNumber, 100)
-                new Tuple<>(1, 100)
+                new Tuple<>(nodeNumber, 100)
+                //new Tuple<>(1, 100)
                 //, new Tuple<>(10, 20)
                 //, new Tuple<>(50, 30)
                 //, new Tuple<>(100, 50)
@@ -300,7 +301,7 @@ public class Neo4jBenchmark {
                 //, new Tuple<>(10000, 100)
         );
         for (Tuple<Integer, Integer> sz : chunkSize) {
-           // List<List<Integer>> verticesPartitioned = Lists.partition(vertices.subList(0, vertices.size() * sz.getSecond() / 100), sz.getFirst());
+           List<List<Integer>> verticesPartitioned = Lists.partition(vertices.subList(0, vertices.size() * sz.getSecond() / 100), sz.getFirst());
             Files.createDirectories(Paths.get("results/" + dataset + "/" + grammarName));
             PrintWriter resulTimePerChunk = new PrintWriter("results/" + dataset + "/" + grammarName + "/" + "chunkSize_" + sz.getFirst() + ".txt");
           //  PrintWriter bigResulTimePerChunk = new PrintWriter("results/" + dataset + "/" + grammarName + "/" + "chunkSize_" + sz.getFirst() + "_big.txt");
@@ -311,9 +312,9 @@ public class Neo4jBenchmark {
                  //   resulTimePerChunk.print(iter - warmUp + 1);
                 //}
                 int finalIter = iter;
-                vertices.forEach(chunk -> {
-                    GraphInput input = new Neo4jBenchmarkInput(graphDb, f, Stream.of(chunk), nodeNumber);
-                    System.out.println("iteration: " + finalIter + " first vertex: " + chunk);
+                verticesPartitioned.forEach(chunk -> {
+                    GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
+                    //System.out.println("iteration: " + finalIter + " first vertex: " + chunk);
                     long result = 0;
                     long t1_local = System.nanoTime();
                     Stream<Pair> parseResults = parser.getReachabilities(input,
@@ -326,7 +327,7 @@ public class Neo4jBenchmark {
                     if (finalIter >= warmUp) {
                                 resulTimePerChunk.println(stepTime);
                     }
-                    System.out.println(" time: " + stepTime + "\n" + "ans:" + result);
+                    System.out.println(" time: " + stepTime + "\n" + "result: " + result);
 
                   //  if (stepTime > 1000000000) {
                     //    resulTimePerChunk.println(chunk.get(0) + "," + stepTime);
@@ -368,6 +369,7 @@ public class Neo4jBenchmark {
 
         List<Tuple<Integer, Integer>> chunkSize = Arrays.asList(
                 new Tuple<>(1, 100)
+//                new Tuple<>(1, 100)
 //                , new Tuple<>(10, 100)
 //               , new Tuple<>(50, 100)
 //                , new Tuple<>(100, 100)
@@ -376,6 +378,9 @@ public class Neo4jBenchmark {
 //                , new Tuple<>(5000, 100)
 //                , new Tuple<>(10000, 100)
         );
+
+        final int[] countResults = {0};
+
         for (Tuple<Integer, Integer> sz : chunkSize) {
             List<List<Integer>> verticesPartitioned = Lists.partition(vertices.subList(0, vertices.size() * sz.getSecond() / 100), sz.getFirst());
             Files.createDirectories(Paths.get("results/sppf/" + dataset + "/" + grammarName));
@@ -390,8 +395,9 @@ public class Neo4jBenchmark {
                     GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
                     System.out.println("iteration: " + finalIter + " first vertex: " + chunk.get(0));
                         long t1_local = System.nanoTime();
-                        Map<Pair, ParseTreeNode> parseResults = parser.getParserTree(input,
-                                new ParseOptions.Builder().setAmbiguous(false).build());
+//                        Map<Pair, ParseTreeNode> parseResults = parser.getParserTree(input,
+//                                new ParseOptions.Builder().setAmbiguous(false).build());
+                        Map<Pair, NonterminalNode> parseResults = parser.getSPPF(input);
                         long t2_local = System.nanoTime();
                         long stepTime = t2_local - t1_local;
                         if (finalIter >= warmUp) {
@@ -401,7 +407,6 @@ public class Neo4jBenchmark {
                             System.out.println(" time: " + stepTime + "\n" + "ans:" + parseResults.size());
                         }
                     ((Neo4jBenchmarkInput) input).close();
-
                 });
                 long t2 = System.nanoTime();
                 //  if (iter >= warmUp) {

@@ -77,7 +77,7 @@ public class NonterminalNode implements ParseTreeNode {
 
     @Override
     public int hashCode() {
-        return hash(start, end, rule, children);
+        return hash(start, end, rule);
     }
 
     @Override
