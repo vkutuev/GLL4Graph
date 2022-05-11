@@ -96,7 +96,9 @@ Grammar used for **static code analysis** graphs:
 
 ### Results
 
-The results of the **all pairs reachability** queries evaluation on graphs related to **RDF analysis**:
+The results of the **all pairs reachability** queries evaluation on graphs related to **RDF analysis** are listed below.
+
+The sign ’–’ in cells means that the respective query is not applicable to the graph, so time is not measured.
 
 <table>
   <thead>
@@ -200,8 +202,10 @@ The evaluation results for **single source** CFPQ for graphs related to **RDF an
   The results for graphs related to static code analysis are compared to results of Azimov’s CFPQ algorithm based on matrix operations. [The implementation](https://github.com/JetBrains-Research/CFPQ_PyAlgo/blob/master/src/problems/Base/algo/matrix_base/matrix_base.py) 
   from [CFPQ_PyAlgo](https://github.com/JetBrains-Research/CFPQ_PyAlgo) was taken as the implementation of the matrix CFPQ algorithm. This library contains the implementation for both scenarios, all pairs reachability and single source reachability. To perform matrix operations pygraphblas is used. [Pygraphblas](https://github.com/Graphegon/pygraphblas) is a python wrapper over the SuiteSparse library, which based on the [GraphBLAS](http://graphblas.org/index.php?title=Graph_BLAS_Forum) framework.
     
-The results of the **all pairs reachability** queries evaluation on graphs related to **static code analysis**:
-
+The results of the **all pairs reachability** queries evaluation on graphs related to **static code analysis** are listed below.
+    
+The sign ’–’ in cells means that the respective query and graph require a considerable amount of memory during algorithm execution that leads to unpredictable time to get the result.
+    
 <table>
   <thead>
     <tr>
@@ -217,7 +221,7 @@ The results of the **all pairs reachability** queries evaluation on graphs relat
   <tbody>
       <tr>
       <td align="left">Apache</td>
-      <td align="center">-</td>
+      <td align="center">–</td>
       <td align="center">536,7</td>
       <td align="center">92 806 768</td>
     </tr>
@@ -259,7 +263,7 @@ The results of the **all pairs reachability** queries evaluation on graphs relat
     </tr>
       <tr>
       <td align="left">Postgre</td>
-      <td align="center">-</td>
+      <td align="center">–</td>
            <td align="center">969,88</td>
       <td align="center"> 90 661 446</td>
     </tr>
