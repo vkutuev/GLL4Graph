@@ -95,7 +95,7 @@ Grammar used for **static code analysis** graphs:
   ```
 
 ### Results
-  
+
 The results of the **all pairs reachability** queries evaluation on graphs related to **RDF analysis**:
 
 <table>
@@ -190,16 +190,27 @@ The results of the **all pairs reachability** queries evaluation on graphs relat
   </tbody>
 </table>
 
+The evaluation results for **single source** CFPQ for graphs related to **RDF analysis** and **G<sub>1**, **G<sub>2**, **Geo** grammars respectively in **reachability** and **all paths** scenarious:
+
+![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-g1.png)
+![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-g2.png)
+![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-geo.png)
+
+
+  The results for graphs related to static code analysis are compared to results of Azimov’s CFPQ algorithm based on matrix operations. [The implementation](https://github.com/JetBrains-Research/CFPQ_PyAlgo/blob/master/src/problems/Base/algo/matrix_base/matrix_base.py) 
+  from [CFPQ_PyAlgo](https://github.com/JetBrains-Research/CFPQ_PyAlgo) was taken as the implementation of the matrix CFPQ algorithm. This library contains the implementation for both scenarios, all pairs reachability and single source reachability. To perform matrix operations pygraphblas is used. [Pygraphblas](https://github.com/Graphegon/pygraphblas) is a python wrapper over the SuiteSparse library, which based on the [GraphBLAS](http://graphblas.org/index.php?title=Graph_BLAS_Forum) framework.
+    
 The results of the **all pairs reachability** queries evaluation on graphs related to **static code analysis**:
 
 <table>
   <thead>
     <tr>
       <th rowspan="2" align="left">Graph name</th>
-      <th colspan="2" align="center">PointsTo</th>
+      <th colspan="3" align="center">PointsTo</th>
     </tr>
     <tr>
-      <td align="center">time (sec)</td>
+      <td align="center">Neo4j time (sec)</td>
+       <td align="center"> GraphBLAS time (sec)</td> 
       <td>#answer</td>
     </tr>
   </thead>
@@ -207,76 +218,91 @@ The results of the **all pairs reachability** queries evaluation on graphs relat
       <tr>
       <td align="left">Apache</td>
       <td align="center">-</td>
-      <td align="center">-</td>
+      <td align="center">536,7</td>
+      <td align="center">92 806 768</td>
     </tr>
       <tr>
       <td align="left">Block</td>
       <td align="center">113,01</td>
+           <td align="center">123,88</td>
       <td align="center">5 351 409</td>
     </tr>
       <tr>
       <td align="left">Fs</td>
       <td align="center">167,73</td>
+           <td align="center">105,72</td>
       <td align="center">9 646 475</td>
     </tr>
       <tr>
       <td align="left">Ipc</td>
       <td align="center">109,43</td>
+           <td align="center">79,52</td>
       <td align="center">5 249 389</td>
     </tr>
       <tr>
       <td align="left">Lib</td>
       <td align="center">111,09</td>
+           <td align="center">121,79</td>
       <td align="center">5 276 303</td>
     </tr>
       <tr>
       <td align="left">Mm</td>
       <td align="center">77,92</td>
+           <td align="center">84,15</td>
       <td align="center">3 990 305</td>
     </tr>
       <tr>
       <td align="left">Net</td>
       <td align="center">160,64</td>
+           <td align="center">206,29</td>
       <td align="center">8 833 403</td>
     </tr>
       <tr>
       <td align="left">Postgre</td>
       <td align="center">-</td>
-      <td align="center">-</td>
+           <td align="center">969,88</td>
+      <td align="center"> 90 661 446</td>
     </tr>
       <tr>
       <td align="left">Security</td>
       <td align="center">115,75</td>
+           <td align="center">181,7</td>
       <td align="center">5 593 387</td>
     </tr>
       <tr>
       <td align="left">Sound</td>
       <td align="center">120,14</td>
+           <td align="center">133,64</td>
       <td align="center">6 085 269</td>
     </tr>
     <tr>
       <td align="left">Init</td>
       <td align="center">87,25</td>
+         <td align="center">45,84</td>
       <td align="center">3 783 769</td>
     </tr>
     <tr>
       <td align="left">Arch</td>
       <td align="center">130,77</td>
+         <td align="center">119,92</td>
       <td align="center">5 339 563</td>
     </tr>
     <tr>
       <td align="left">Crypto</td>
       <td align="center">128,8</td>
+         <td align="center">122,09</td>
       <td align="center">5 428 237</td>
     </tr>
     <tr>
       <td align="left">Drivers</td>
       <td align="center">371,18</td>
+         <td align="center">279,39</td>
       <td align="center">18 825 025</td>
     </tr>
     <tr>
       <td align="left">Kernel</td>
       <td align="center">614,047</td>
+         <td align="center">378,05</td>
       <td align="center">16 747 731</td>
     </tr>
   </tbody>
@@ -284,15 +310,10 @@ The results of the **all pairs reachability** queries evaluation on graphs relat
 
 <br/>
 
-The evaluation results for **single source** CFPQ for graphs related to **RDF analysis** and **G<sub>1**, **G<sub>2**, **Geo** grammars respectively in **reachability** and **all paths** scenarious:
-
-![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-g1.png)
-![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-g2.png)
-![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-geo.png)
 
 The evaluation results for **single source** CFPQ for graphs related to **static code analysis** and **pointsTo** grammar in **reachability** and **all paths** scenarious:
 
-![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-stat.png)
+![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/stat-m.png)
     
 ## Download and build
 
@@ -352,3 +373,4 @@ graph_loader.py --graph core --relationships subClassOf,type
 
 This project is licensed under OpenBSD License. License text can be found in the 
 [license file](https://github.com/JetBrains-Research/GLL4Graph/blob/GLL-for-graph/LICENSE.md).
+
