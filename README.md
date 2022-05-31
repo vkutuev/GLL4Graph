@@ -6,7 +6,7 @@ This is the implementation of the GLL-based context-free path querying (CFPQ) al
 
 ## Performance
 
-The proposed solution has been evaluated on several real-world graphs for both the all pairs and the multiple sources scenarios. The evaluation shows that the proposed solution is more than 25 times faster than the previous solution for Neo4j and is comparable, in some cases, with the linear algebra based solution for RedisGraph.
+The proposed solution has been evaluated on several real-world graphs for both the all pairs and the multiple sources scenarios. The evaluation shows that the proposed solution is more than 45 times faster than the previous solution for Neo4j and is comparable, in some scenarios and cases, with the linear algebra based solution.
 
 **Machine configuration**: PC with Ubuntu 20.04, Intel Core i7-6700 3.40GHz CPU, DDR4 64Gb RAM.
 
@@ -30,6 +30,8 @@ A detailed description of the graphs is listed bellow.
 
 | Graph name   |  \|*V*\|   |  \|*E*\|   | #subClassOf |   #type   | #broaderTransitive |
 |:-------------|:----------:|:----------:|:-----------:|:---------:|:------------------:|
+| Core         |   1 323    |  2 752     |       178   |     0     |         0          |
+| Pathways |   6 238   |  12 363   |   3 117   |     3 118     |         0          |
 | Go hierarchy |   45 007   |  490 109   |   490 109   |     0     |         0          |
 | Enzyme       |   48 815   |   86 543   |    8 163    |  14 989   |       8 156        | 
 | Eclass_514en |  239 111   |  360 248   |   90 962    |  72 517   |         0          | 
@@ -41,9 +43,21 @@ A detailed description of the graphs is listed bellow.
 
 | Graph name   |  \|*V*\|   |  \|*E*\|   |    #a     |    #d     |
 |:-------------|:----------:|:----------:|:---------:|:---------:|
-| Init         | 2 446 224  | 2 112 809  |  481 994  | 1 630 815 |
-| Drivers      | 4 273 803  | 3 707 769  |  858 568  | 2 849 201 |
-| Kernel       | 11 254 434 | 9 484 213  | 1 981 258 | 7 502 955 |
+| Apache       |  1 721 418 |  1 510 411  |  362 799 |  1 147 612 | 
+| Block          |  3 423 234 |  2 951 393  |  669 238 |  2 282 155 | 
+| Fs             |  4 177 416 |  3 609 373 |  824 430 |  2 784 943 | 
+|       Ipc            |  3 401 022 |  2 931 498 |  664 151 |  2 267 347 | 
+|     Lib            |  3 401 355 |  2 931 880 |  664 311 |  2 267 569 | 
+|   Mm             |  2 538 243 |  2 191 079 |  498 918 |  1 692 161 | 
+|  Net            |  4 039 470 |  3 500 141 |  807 162 |  2 692 979 | 
+| Postgre       |  5 203 419 |  4 678 543 |  1 209 597 |  3 468 946 | 
+| Security       |  3 479 982 |  3 003 326 |  683 339 |  2 319 987 | 
+| Sound          |  3 528 861 |  3 049 732 |  697 159 |  2 352 573 | 
+| Init           |  2 446 224 |  2 112 809 | 481 994 |  1 630 815 | 
+| Arch           |  3 448 422 |  2 970 242 |  6 712 95 |  2 298 947 | 
+| Crypto         |  3 464 970 |  2 988 387 |  678 408 |  2 309 979 | 
+| Drivers        |  4 273 803 |  3 707 769 |  858 568 |  2 849 201 | 
+| Kernel         |  11 254 434 |  9 484 213  |  1 981 258 |  7 502 955 | 
 
 ### Grammars
 
@@ -81,8 +95,10 @@ Grammar used for **static code analysis** graphs:
   ```
 
 ### Results
-  
-The results of the **all pairs reachability** queries evaluation are presented in the table below.
+
+The results of the **all pairs reachability** queries evaluation on graphs related to **RDF analysis** are listed below.
+
+The sign ’–’ in cells means that the respective query is not applicable to the graph, so time is not measured.
 
 <table>
   <thead>
@@ -91,7 +107,6 @@ The results of the **all pairs reachability** queries evaluation are presented i
       <th colspan="2" align="center">G<sub>1</sub></th>
       <th colspan="2" align="center">G<sub>2</sub></th>
       <th colspan="2" align="center">Geo</th>
-      <th colspan="2" align="center">PointsTo</th>
     </tr>
     <tr>
       <td align="center">time (sec)</td>
@@ -100,108 +115,198 @@ The results of the **all pairs reachability** queries evaluation are presented i
       <td align="center">#answer</td>
       <td align="center">time (sec)</td>
       <td align="center">#answer</td>
-      <td align="center">time (sec)</td>
-      <td align="center">#answer</td>
     </tr>
   </thead>
   <tbody>
+      <tr>
+      <td align="left">Core</td>
+      <td align="center">0,02</td>
+      <td>204</td>
+      <td align="center">0,01</td>
+      <td align="center">214</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+    </tr><tr>
+      <td align="left">Pathways</td>
+      <td align="center">0,07</td>
+      <td>884</td>
+      <td align="center">0,04</td>
+      <td align="center">3117</td>
+      <td align="center">–</td>
+      <td align="center">–</td>
+    </tr>
     <tr>
       <td align="left">Go hierarchy</td>
-      <td align="center">564,72</td>
+      <td align="center">3,68</td>
       <td>588 976</td>
-      <td align="center">2813,50</td>
+      <td align="center">5,42</td>
       <td align="center">738 937</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
       <td align="center">–</td>
       <td align="center">–</td>
     </tr>
     <tr>
       <td align="left">Enzyme</td>
-      <td align="center">0,19</td>
+      <td align="center">0,22</td>
       <td>396</td>
       <td align="center">0,17</td>
       <td align="center">8163</td>
-      <td align="center">8,54</td>
+      <td align="center">5,7</td>
       <td align="center">14 267 542</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
     </tr>
     <tr>
-      <td align="left">Eclass_514en</td>
-      <td align="center">295,06</td>
+      <td align="left">Eclass</td>
+      <td align="center">1,5</td>
       <td>90 994</td>
-      <td align="center">279,80</td>
+      <td align="center">0,97</td>
       <td align="center">96 163</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
       <td align="center">–</td>
       <td align="center">–</td>
     </tr>
     <tr>
       <td align="left">Geospecies</td>
-      <td align="center">2,64</td>
+      <td align="center">2,89</td>
       <td>85</td>
-      <td align="center">2,00</td>
+      <td align="center">2,65</td>
       <td align="center">0</td>
-      <td align="center">256,86</td>
+      <td align="center">145,8</td>
       <td align="center">226 669 749</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
     </tr>
     <tr>
       <td align="left">Go</td>
-      <td align="center">11,18</td>
+      <td align="center">5,56</td>
       <td>640 316</td>
-      <td align="center">10,00</td>
+      <td align="center">4,24</td>
       <td align="center">659 501</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
       <td align="center">–</td>
       <td align="center">–</td>
     </tr>
     <tr>
       <td align="left">Taxonomy</td>
-      <td align="center">43,72</td>
+      <td align="center">45,47</td>
       <td>151 706</td>
-      <td align="center">29,58</td>
+      <td align="center">36,06</td>
       <td align="center">2 112 637</td>
       <td align="center">–</td>
       <td align="center">–</td>
+    </tr>
+  </tbody>
+</table>
+
+The evaluation results for **single source** CFPQ for graphs related to **RDF analysis** and **G<sub>1**, **G<sub>2**, **Geo** grammars respectively in **reachability** and **all paths** scenarious:
+
+![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-g1.png)
+![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-g2.png)
+![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/ss-geo.png)
+
+
+  The results for graphs related to static code analysis are compared to results of Azimov’s CFPQ algorithm based on matrix operations. [The implementation](https://github.com/JetBrains-Research/CFPQ_PyAlgo/blob/master/src/problems/Base/algo/matrix_base/matrix_base.py) 
+  from [CFPQ_PyAlgo](https://github.com/JetBrains-Research/CFPQ_PyAlgo) was taken as the implementation of the matrix CFPQ algorithm. This library contains the implementation for both scenarios, all pairs reachability and single source reachability. To perform matrix operations pygraphblas is used. [Pygraphblas](https://github.com/Graphegon/pygraphblas) is a python wrapper over the SuiteSparse library, which based on the [GraphBLAS](http://graphblas.org/index.php?title=Graph_BLAS_Forum) framework.
+    
+The results of the **all pairs reachability** queries evaluation on graphs related to **static code analysis** are listed below.
+    
+The sign ’–’ in cells means that the respective query and graph require a considerable amount of memory during algorithm execution that leads to unpredictable time to get the result.
+    
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" align="left">Graph name</th>
+      <th colspan="3" align="center">PointsTo</th>
+    </tr>
+    <tr>
+      <td align="center">Neo4j time (sec)</td>
+       <td align="center"> GraphBLAS time (sec)</td> 
+      <td>#answer</td>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+      <td align="left">Apache</td>
       <td align="center">–</td>
+      <td align="center">536,7</td>
+      <td align="center">92 806 768</td>
+    </tr>
+      <tr>
+      <td align="left">Block</td>
+      <td align="center">113,01</td>
+           <td align="center">123,88</td>
+      <td align="center">5 351 409</td>
+    </tr>
+      <tr>
+      <td align="left">Fs</td>
+      <td align="center">167,73</td>
+           <td align="center">105,72</td>
+      <td align="center">9 646 475</td>
+    </tr>
+      <tr>
+      <td align="left">Ipc</td>
+      <td align="center">109,43</td>
+           <td align="center">79,52</td>
+      <td align="center">5 249 389</td>
+    </tr>
+      <tr>
+      <td align="left">Lib</td>
+      <td align="center">111,09</td>
+           <td align="center">121,79</td>
+      <td align="center">5 276 303</td>
+    </tr>
+      <tr>
+      <td align="left">Mm</td>
+      <td align="center">77,92</td>
+           <td align="center">84,15</td>
+      <td align="center">3 990 305</td>
+    </tr>
+      <tr>
+      <td align="left">Net</td>
+      <td align="center">160,64</td>
+           <td align="center">206,29</td>
+      <td align="center">8 833 403</td>
+    </tr>
+      <tr>
+      <td align="left">Postgre</td>
       <td align="center">–</td>
+           <td align="center">969,88</td>
+      <td align="center"> 90 661 446</td>
+    </tr>
+      <tr>
+      <td align="left">Security</td>
+      <td align="center">115,75</td>
+           <td align="center">181,7</td>
+      <td align="center">5 593 387</td>
+    </tr>
+      <tr>
+      <td align="left">Sound</td>
+      <td align="center">120,14</td>
+           <td align="center">133,64</td>
+      <td align="center">6 085 269</td>
     </tr>
     <tr>
       <td align="left">Init</td>
-      <td align="center">–</td>
-      <td>–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">113,35</td>
+      <td align="center">87,25</td>
+         <td align="center">45,84</td>
       <td align="center">3 783 769</td>
     </tr>
     <tr>
+      <td align="left">Arch</td>
+      <td align="center">130,77</td>
+         <td align="center">119,92</td>
+      <td align="center">5 339 563</td>
+    </tr>
+    <tr>
+      <td align="left">Crypto</td>
+      <td align="center">128,8</td>
+         <td align="center">122,09</td>
+      <td align="center">5 428 237</td>
+    </tr>
+    <tr>
       <td align="left">Drivers</td>
-      <td align="center">–</td>
-      <td>–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">736,81</td>
+      <td align="center">371,18</td>
+         <td align="center">279,39</td>
       <td align="center">18 825 025</td>
     </tr>
     <tr>
       <td align="left">Kernel</td>
-      <td align="center">–</td>
-      <td>–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">–</td>
-      <td align="center">850,46</td>
+      <td align="center">614,047</td>
+         <td align="center">378,05</td>
       <td align="center">16 747 731</td>
     </tr>
   </tbody>
@@ -209,10 +314,11 @@ The results of the **all pairs reachability** queries evaluation are presented i
 
 <br/>
 
-The evaluation results for **multiple source** CFPQ for **Geospecies** graph and **Geo** grammar in reachability and all path scenarious are listed bellow.
 
-![time](https://github.com/YaccConstructor/iguana/blob/GLL-for-graph/docs/pictures/geospecies_chunks.svg?raw=true&sanitize=true)
+The evaluation results for **single source** CFPQ for graphs related to **static code analysis** and **pointsTo** grammar in **reachability** and **all paths** scenarious:
 
+![time](https://github.com/JetBrains-Research/GLL4Graph/blob/master/docs/pictures/stat-m.png)
+    
 ## Download and build
 
 The project is build with Maven.
@@ -271,3 +377,4 @@ graph_loader.py --graph core --relationships subClassOf,type
 
 This project is licensed under OpenBSD License. License text can be found in the 
 [license file](https://github.com/JetBrains-Research/GLL4Graph/blob/GLL-for-graph/LICENSE.md).
+
