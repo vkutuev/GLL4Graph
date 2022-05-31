@@ -298,11 +298,11 @@ public class Neo4jBenchmark {
         }
 
         List<Tuple<Integer, Integer>> chunkSize = Arrays.asList(
-                new Tuple<>(1, 100)
+//                new Tuple<>(nodeNumber, 100)
 //                new Tuple<>(1, 100)
 //                , new Tuple<>(10, 100)
 //               , new Tuple<>(50, 100)
-//                , new Tuple<>(100, 100)
+                 new Tuple<>(100, 100)
 //                , new Tuple<>(500, 100)
 //                , new Tuple<>(1000, 100)
 //                , new Tuple<>(5000, 100)
@@ -321,7 +321,7 @@ public class Neo4jBenchmark {
                     resulTimePerChunk.print(iter - warmUp + 1);
                 }
                 int finalIter = iter;
-                verticesPartitioned.forEach(chunk -> {
+                verticesPartitioned.parallelStream().forEach(chunk -> {
                     GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
                     System.out.println("iteration: " + finalIter + " first vertex: " + chunk.get(0));
                         long t1_local = System.nanoTime();
