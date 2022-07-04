@@ -8,6 +8,7 @@ import apoc.periodic.*;
 
 import static java.lang.System.gc;
 import static java.util.Arrays.asList;
+
 import com.google.common.collect.Lists;
 
 import iguana.utils.input.GraphInput;
@@ -72,8 +73,8 @@ public class Neo4jBenchmark {
     public static void main(String[] args) throws IOException {
 
         loadGraph(args[6], Integer.parseInt(args[1]), args[4], args[0]);
-        benchmark(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
-        //benchmarkReachabilities(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
+        //benchmark(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
+        benchmarkReachabilities(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), args[5], args[6], args[7], args[4]);
         removeData();
         managementService.shutdown();
     }
@@ -165,16 +166,16 @@ public class Neo4jBenchmark {
         }
     }
 
-    public static void loadGraph(String dataset,  int nodeNumber, String pathToDataset, String typeOfRelationships) throws IOException {
+    public static void loadGraph(String dataset, int nodeNumber, String pathToDataset, String typeOfRelationships) throws IOException {
         FileUtils.deleteRecursively(databaseDirectory);
         managementService =
                 new DatabaseManagementServiceBuilder(databaseDirectory)
                         //.setConfig(GraphDatabaseSettings.pagecache_memory, "100G")
                         .setConfig(GraphDatabaseSettings.tx_state_max_off_heap_memory, java.lang.Long.parseLong("24000000000"))
                         .setConfig(GraphDatabaseSettings.pagecache_warmup_enabled, true)
-                        .setConfig(GraphDatabaseSettings.procedure_whitelist, List.of("gds.*","apoc.*", "apoc.load.*"))
+                        .setConfig(GraphDatabaseSettings.procedure_whitelist, List.of("gds.*", "apoc.*", "apoc.load.*"))
                         .setConfig(GraphDatabaseSettings.procedure_unrestricted, List.of("gds.*", "apoc.*"))
-                        .setConfig(GraphDatabaseSettings.default_allowed,"gds.*,apoc.*")
+                        .setConfig(GraphDatabaseSettings.default_allowed, "gds.*,apoc.*")
                         .setConfig(BoltConnector.enabled, true)
                         .setConfig(ApocSettings.apoc_import_file_enabled, true)
                         .setConfig(ApocSettings.apoc_import_file_use__neo4j__config, false)
@@ -189,7 +190,7 @@ public class Neo4jBenchmark {
         ));
 
         try (Stream<String> inputNodes = Files.lines(Paths.get("/" + pathToDataset + dataset + "_all_nodes.csv"))) {
-            try (Transaction tx = graphDb.beginTx()){
+            try (Transaction tx = graphDb.beginTx()) {
                 inputNodes.forEach(node -> {
                     String s = String.format("CREATE (:Node {name: '%d'});", Integer.parseInt(node));
                     tx.execute(s);
@@ -198,12 +199,12 @@ public class Neo4jBenchmark {
             }
         }
         // try (Transaction tx = graphDb.beginTx()) {
-          //  for (int i = 0; i < nodeNumber; ++i) {
-            //    String s = String.format("CREATE (:Node {name: '%d'});", i);
-              //  tx.execute(s);
-           // }
-           // tx.commit();
-       // }
+        //  for (int i = 0; i < nodeNumber; ++i) {
+        //    String s = String.format("CREATE (:Node {name: '%d'});", i);
+        //  tx.execute(s);
+        // }
+        // tx.commit();
+        // }
 
         try (Transaction tx = graphDb.beginTx()) {
             tx.execute("CREATE CONSTRAINT node_unique_name ON (n:Node) ASSERT n.name IS UNIQUE");
@@ -214,47 +215,47 @@ public class Neo4jBenchmark {
         if ("bt".equals(typeOfRelationships)) {
             try (Transaction tx = graphDb.beginTx()) {
                 tx.execute("        CALL apoc.periodic.iterate(\n" +
-                           "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_broaderTransitive.csv') YIELD map AS row RETURN row\",\n" +
-                           "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
-                           "            CREATE (f)-[:broaderTransitive]->(t)\",\n" +
-                           "            {batchSize:10000, parallel:false}\n" +
-                           "        )\n" +
-                           "        YIELD batches, total;\n");
+                        "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_broaderTransitive.csv') YIELD map AS row RETURN row\",\n" +
+                        "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
+                        "            CREATE (f)-[:broaderTransitive]->(t)\",\n" +
+                        "            {batchSize:10000, parallel:false}\n" +
+                        "        )\n" +
+                        "        YIELD batches, total;\n");
                 tx.execute("        CALL apoc.periodic.iterate(\n" +
-                           "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_other.csv') YIELD map AS row RETURN row\",\n" +
-                           "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
-                           "            CREATE (f)-[:other]->(t)\",\n" +
-                           "            {batchSize:100000, parallel:false}\n" +
-                           "        )\n" +
-                           "        YIELD batches, total;\n");
+                        "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_other.csv') YIELD map AS row RETURN row\",\n" +
+                        "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
+                        "            CREATE (f)-[:other]->(t)\",\n" +
+                        "            {batchSize:100000, parallel:false}\n" +
+                        "        )\n" +
+                        "        YIELD batches, total;\n");
                 tx.commit();
             }
-        } else if ("st".equals(typeOfRelationships)){
+        } else if ("st".equals(typeOfRelationships)) {
             try (Transaction tx = graphDb.beginTx()) {
                 tx.execute("        CALL apoc.periodic.iterate(\n" +
-                           "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_subClassOf.csv') YIELD map AS row RETURN row\",\n" +
-                           "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
-                           "            CREATE (f)-[:subClassOf]->(t)\",\n" +
-                           "            {batchSize:10000, parallel:false}\n" +
-                           "        )\n" +
-                           "        YIELD batches, total;\n");
+                        "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_subClassOf.csv') YIELD map AS row RETURN row\",\n" +
+                        "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
+                        "            CREATE (f)-[:subClassOf]->(t)\",\n" +
+                        "            {batchSize:10000, parallel:false}\n" +
+                        "        )\n" +
+                        "        YIELD batches, total;\n");
                 tx.execute("        CALL apoc.periodic.iterate(\n" +
-                           "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_type.csv') YIELD map AS row RETURN row\",\n" +
-                           "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
-                           "            CREATE (f)-[:type]->(t)\",\n" +
-                           "            {batchSize:10000, parallel:false}\n" +
-                           "        )\n" +
-                           "        YIELD batches, total;\n");
+                        "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_type.csv') YIELD map AS row RETURN row\",\n" +
+                        "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
+                        "            CREATE (f)-[:type]->(t)\",\n" +
+                        "            {batchSize:10000, parallel:false}\n" +
+                        "        )\n" +
+                        "        YIELD batches, total;\n");
                 tx.execute("        CALL apoc.periodic.iterate(\n" +
-                           "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_other.csv') YIELD map AS row RETURN row\",\n" +
-                           "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
-                           "            CREATE (f)-[:other]->(t)\",\n" +
-                           "            {batchSize:100000, parallel:false}\n" +
-                           "        )\n" +
-                           "        YIELD batches, total;\n");
+                        "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_other.csv') YIELD map AS row RETURN row\",\n" +
+                        "            \"MATCH (f:Node {name: row.from}), (t:Node {name: row.to})\n" +
+                        "            CREATE (f)-[:other]->(t)\",\n" +
+                        "            {batchSize:100000, parallel:false}\n" +
+                        "        )\n" +
+                        "        YIELD batches, total;\n");
                 tx.commit();
             }
-        } else if ("ad".equals(typeOfRelationships)){
+        } else if ("ad".equals(typeOfRelationships)) {
             try (Transaction tx = graphDb.beginTx()) {
                 tx.execute("        CALL apoc.periodic.iterate(\n" +
                         "            \"CALL apoc.load.csv('FILE:///" + pathToDataset + dataset + "_D.csv') YIELD map AS row RETURN row\",\n" +
@@ -277,6 +278,70 @@ public class Neo4jBenchmark {
     }
 
     public static void benchmarkReachabilities(String relType, int nodeNumber, int warmUp, int maxIter, String pathToGrammar, String dataset, String grammarName, String pathToDataset) throws IOException {
+        BiFunction<Relationship, Direction, String> f = getFunction(relType);
+
+        Map<String, List<Integer>> vertexToTime = new HashMap<>();
+        Grammar grammar;
+        try {
+            grammar = Grammar.load(pathToGrammar, "json");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("No grammar.json file is present");
+        }
+        Runtime r = Runtime.getRuntime();
+        PrintWriter outStatsTime = new PrintWriter("results/" + dataset + "_" + relType + "_time_reachabilities.csv");
+        outStatsTime.append("chunk_size, time");
+        outStatsTime.append("\n");
+
+        //List<Integer> chunkSize = Arrays.asList(10000);
+        Integer chunkSize = nodeNumber;
+        List<Integer> vertices = Interval.zeroTo(nodeNumber - 1);
+        List<List<Integer>> verticesPartitioned = Lists.partition(vertices, chunkSize);
+        long t1 = System.nanoTime();
+        r.gc();
+        long m1 = r.totalMemory() - r.freeMemory();
+        List<Integer> sumResult = new ArrayList<>();
+        verticesPartitioned.forEach(chunk -> {
+            for (int iter = 0; iter < maxIter; ++iter) {
+                IguanaParser parser = new IguanaParser(grammar);
+                //System.out.println("iter 0" + " chunkSize " + sz);
+                GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
+                long t1_local = System.nanoTime();
+                Stream<Pair> parseResults = parser.getReachabilities(input,
+                        new ParseOptions.Builder().setAmbiguous(false).build());
+                //sumResult.add(parseResults.getSecond());
+                long m2 = r.totalMemory() - r.freeMemory();
+                long curM = (m2 - m1);
+                long t2_local = System.nanoTime();
+                long stepTime = t2_local - t1_local;
+                //curT[0] += stepTime;a
+                //System.out.println("My id " + myId + "; full time is " + curT[0] + "; step time is " + stepTime);
+                System.out.println("Used memory is " + curM);
+                r.gc();
+                ((Neo4jBenchmarkInput) input).close();
+                /*if (parseResults != null) {
+                    vertexToTime.putIfAbsent(sz.toString(), new ArrayList<>());
+                    vertexToTime.get(sz.toString()).add((int) curT[0]);
+                    }*/
+                if (parseResults != null)
+                    System.out.println(parseResults.count());
+//                    if (parseResults != null) {
+//                        return parseResults.count();
+//                    } else {
+//                        return  0;
+//                    }
+            }
+        });
+
+        final long[] curT = {0};
+
+        Integer i = 0;
+
+
+        long t2 = System.nanoTime();
+//        System.out.println("Total answer: " + finalResultCount);
+        //System.out.println("Total memory: " + curM);
+
+        outStatsTime.close();
     }
 
     public static void benchmark(String relType, int nodeNumber, int warmUp, int maxIter, String pathToGrammar, String dataset, String grammarName, String pathToDataset) throws IOException {
@@ -298,11 +363,11 @@ public class Neo4jBenchmark {
         }
 
         List<Tuple<Integer, Integer>> chunkSize = Arrays.asList(
-//                new Tuple<>(nodeNumber, 100)
+                new Tuple<>(1, 100)
 //                new Tuple<>(1, 100)
 //                , new Tuple<>(10, 100)
 //               , new Tuple<>(50, 100)
-                 new Tuple<>(100, 100)
+//                , new Tuple<>(100, 100)
 //                , new Tuple<>(500, 100)
 //                , new Tuple<>(1000, 100)
 //                , new Tuple<>(5000, 100)
@@ -324,18 +389,18 @@ public class Neo4jBenchmark {
                 verticesPartitioned.parallelStream().forEach(chunk -> {
                     GraphInput input = new Neo4jBenchmarkInput(graphDb, f, chunk.stream(), nodeNumber);
                     System.out.println("iteration: " + finalIter + " first vertex: " + chunk.get(0));
-                        long t1_local = System.nanoTime();
+                    long t1_local = System.nanoTime();
 //                        Map<Pair, ParseTreeNode> parseResults = parser.getParserTree(input,
 //                                new ParseOptions.Builder().setAmbiguous(false).build());
-                        Map<Pair, NonterminalNode> parseResults = parser.getSPPF(input);
-                        long t2_local = System.nanoTime();
-                        long stepTime = t2_local - t1_local;
-                        if (finalIter >= warmUp) {
-                            resulTimePerChunk.println(stepTime);
-                        }
-                        if (parseResults != null) {
-                            System.out.println(" time: " + stepTime + "\n" + "ans:" + parseResults.size());
-                        }
+                    Map<Pair, NonterminalNode> parseResults = parser.getSPPF(input);
+                    long t2_local = System.nanoTime();
+                    long stepTime = t2_local - t1_local;
+                    if (finalIter >= warmUp) {
+                        resulTimePerChunk.println(stepTime);
+                    }
+                    if (parseResults != null) {
+                        System.out.println(" time: " + stepTime + "\n" + "ans:" + parseResults.size());
+                    }
                     ((Neo4jBenchmarkInput) input).close();
                 });
                 long t2 = System.nanoTime();
