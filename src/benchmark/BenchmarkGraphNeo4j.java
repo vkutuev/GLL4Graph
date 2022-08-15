@@ -5,7 +5,8 @@ import apoc.create.Create;
 import apoc.export.csv.ImportCsv;
 import apoc.help.Help;
 import apoc.periodic.Periodic;
-import org.iguana.grammar.Grammar;
+import iguana.utils.input.GraphInput;
+import iguana.utils.input.Neo4jBenchmarkInput;
 import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.configuration.connectors.BoltConnector;
 import org.neo4j.dbms.api.DatabaseManagementService;
@@ -19,61 +20,22 @@ import org.neo4j.io.fs.FileUtils;
 import org.neo4j.kernel.api.procedure.GlobalProcedures;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 
-public abstract class Neo4jBenchmark {
+public class BenchmarkGraphNeo4j extends BenchmarkGraphStorage {
 
-    protected static String RESULTS_DIR = "results";
+    private int nodesCount;
 
-    // args[0] - benchmarkType
-    // args[1] - nodeNumber
-    // args[2] - number of warm up iteration
-    // args[3] - total number of iterations
-    // args[4] - path to dataset (graph)
-    // args[5] - path to grammar
-    // args[6] - dataset name = name of file with results
-    public static void main(String[] args) throws IOException {
-        Neo4jBenchmark benchmark = benchmarkByType(args[0], Integer.parseInt(args[1]));
-        benchmark.loadGraph(args[4]);
-        benchmark.loadGrammar(args[5]);
-        benchmark.benchmark(parseSettings(new String[]{args[2], args[3], args[6]}));
-        benchmark.removeData();
-        benchmark.managementService.shutdown();
-    }
-    private static Neo4jBenchmark benchmarkByType(String type, int nodesCount) {
-        return switch (type) {
-            // AP - All Pairs; MS - Multiple Sources
-            case "REACHABILITY_AP" -> new ReachabilityBenchmark(nodesCount);
-//            case "REACHABILITY_MS" -> new ReachabilityBenchmark();
-            case "PATH_AP" -> new PathBenchmark(nodesCount);
-//            case "PATH_MS" -> new PathBenchmark();
-            default -> throw new IllegalArgumentException("Illegal benchmark type");
-        };
-    }
+    BenchmarkGraphNeo4j() {
 
-    /**
-     * @param args array contains string params:
-     *             args[0] - warmUpIterations
-     *             args[1] - measurementsIterations
-     *             args[2] - datasetName
-     * @return {@link BenchmarkSettings} instance
-     */
-    private static BenchmarkSettings parseSettings(String[] args) {
-        return new BenchmarkSettings(
-                Integer.parseInt(args[0]),
-                Integer.parseInt(args[1]),
-                args[2]);
-    }
-
-    Neo4jBenchmark(int nodesCount) {
-        this.nodesCount = nodesCount;
     }
 
     private final BiFunction<Relationship, Direction, String> relationship2Label =
@@ -86,9 +48,8 @@ public abstract class Neo4jBenchmark {
     private final File databaseDirectory = new File("target/neo4j-hello-db");
     private GraphDatabaseService graphDb;
     private DatabaseManagementService managementService;
-    private Grammar grammar;
-    private final int nodesCount;
-    public void registerProcedure(GraphDatabaseService graphDb, List<Class<?>> procedures) {
+
+    private void registerProcedure(GraphDatabaseService graphDb, List<Class<?>> procedures) {
         GlobalProcedures globalProcedures = ((GraphDatabaseAPI) graphDb).getDependencyResolver().resolveDependency(GlobalProcedures.class);
         for (Class<?> procedure : procedures) {
             try {
@@ -101,7 +62,15 @@ public abstract class Neo4jBenchmark {
         }
     }
 
-    private void loadGraph(String pathToDataset) throws IOException {
+    private Neo4jBenchmarkInput graphInput = null;
+
+    @Override
+    public void loadGraph(String path) throws IOException {
+
+        try (var lines = Files.lines(Paths.get(path + File.separatorChar + "nodes.csv"))) {
+            nodesCount = (int) lines.count();
+        }
+
         FileUtils.deleteRecursively(databaseDirectory);
         managementService =
                 new DatabaseManagementServiceBuilder(databaseDirectory)
@@ -124,10 +93,11 @@ public abstract class Neo4jBenchmark {
                 Periodic.class
         ));
 
+        String neo4jPath = new File(path).getAbsolutePath();
         try (Transaction tx = graphDb.beginTx()) {
             tx.execute("CALL apoc.import.csv(" +
-                    "[{fileName: 'FILE:///" + pathToDataset + "nodes.csv', labels: ['Node']}], " +
-                    "[{fileName: 'FILE:///" + pathToDataset + "edges.csv'}], " +
+                    "[{fileName: 'FILE:///" + neo4jPath + File.separator + "nodes.csv', labels: ['Node']}], " +
+                    "[{fileName: 'FILE:///" + neo4jPath + File.separator + "edges.csv'}], " +
                     "{delimiter: ' ', stringIds: false}" +
                     ")");
             tx.commit();
@@ -135,17 +105,20 @@ public abstract class Neo4jBenchmark {
         System.out.println("Graph loaded");
     }
 
-    private void loadGrammar(String pathToGrammar) {
-        try {
-            grammar = Grammar.load(pathToGrammar, "json");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("No grammar file is present");
-        }
+    @Override
+    public GraphInput getGraphInput(Stream<Integer> startVertices) {
+        graphInput = new Neo4jBenchmarkInput(graphDb, relationship2Label, startVertices, nodesCount);
+        return graphInput;
     }
 
-    protected abstract void benchmark(BenchmarkSettings settings) throws IOException;
+    @Override
+    protected void onIterationFinish() {
+        graphInput.close();
+        graphInput = null;
+    }
 
-    private void removeData() {
+    @Override
+    protected void close() {
         try (Transaction tx = graphDb.beginTx()) {
             tx.getAllNodes().forEach(node -> {
                 node.getRelationships().forEach(Relationship::delete);
@@ -153,21 +126,12 @@ public abstract class Neo4jBenchmark {
             });
             tx.commit();
         }
+        managementService.shutdown();
     }
 
-    protected BiFunction<Relationship, Direction, String> getRelationship2Label() {
-        return relationship2Label;
+    @Override
+    public String toString() {
+        return "NEO4J";
     }
 
-    protected GraphDatabaseService getGraphDb() {
-        return graphDb;
-    }
-
-    protected Grammar getGrammar() {
-        return grammar;
-    }
-
-    protected int getNodesCount() {
-        return nodesCount;
-    }
 }
