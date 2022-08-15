@@ -1,11 +1,14 @@
 package benchmark;
 
 import iguana.utils.input.GraphInput;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.ParseException;
 import org.iguana.grammar.Grammar;
 import org.iguana.parser.IguanaParser;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class GraphBenchmark {
@@ -27,7 +30,6 @@ public class GraphBenchmark {
         }
         final var benchmark = new GraphBenchmark(settings);
         benchmark.benchmark();
-        return;
     }
 
     private final BenchmarkGraphStorage graphStorage;
@@ -39,7 +41,7 @@ public class GraphBenchmark {
     private final int warmupIterations;
     private final int measurementIterations;
 
-    private GraphBenchmark(BenchmarkSettings settings) throws FileNotFoundException {
+    private GraphBenchmark(BenchmarkSettings settings) {
         graphStorage = BenchmarkGraphStorage.createBenchmarkStorage(settings.getStorageType());
         problem = BenchmarkProblem.createBenchmarkProblem(settings.getProblem());
         scenario = BenchmarkScenario.createBenchmarkScenario(settings.getScenario());
@@ -62,7 +64,7 @@ public class GraphBenchmark {
                 graphStorage.toString())
         );
         boolean fileExists = !outFile.createNewFile();
-        System.out.printf("Benchmarking reachability for %s graph%n", datasetName);
+        System.out.printf("Benchmarking %s for %s graph%n", problem, datasetName);
         try (PrintWriter outStatsTime = new PrintWriter(new FileOutputStream(outFile, true), true)) {
             if (!fileExists) {
                 outStatsTime.println(scenario.getCsvHeader());
